@@ -1,0 +1,47 @@
+1. We implement our tr2b.c program using getchar and putchar for
+   transliterating bytes
+2. We implement our tr2u.c program using read and write for
+   transliterating bytes
+   Afterwards, we compile both of them with C11 standard.
+$ gcc -std=c11 tr2b.c -o tr2b
+$ gcc -std=c11 tr2u.c -o tr2u
+
+3. We then create a file of 5,000,000 bytes
+$ head --bytes=5000000 /dev/urandom > output.txt
+  Then we use the strace command to compare system calls for tr2b and tr2u
+  a) For copying one file to another, we do the following
+$ strace -o strace_output1 ./tr2b 'AB' 'XY' < output.txt > file2fileb
+$ strace -o strace_output2 ./tr2u 'AB' 'XY' < output.txt > file2fileu
+  b) For copying a file to the terminal, we do the following
+$ strace -o strace_output3 ./tr2b 'AB' 'XY' <output.txt
+$ strace -o strace_output4 ./tr2u 'AB' 'XY' <output.txt
+  We then use wc -l to find out how many lines of system calls there are
+$ wc -l strace_output1
+1252 strace_output1
+$ wc -l strace_output2
+10000026 strace_output2
+$ wc -l strace_output3
+20646 strace_output3
+$ wc -l strace_output4
+10000026 strace_output4
+
+4. Now we measure how fast each program is, copying the same amount of data.
+$ time strace -o strace_output1 ./tr2b 'AB' 'XY' <output.txt>file2fileb
+real    0m0.237s
+user    0m0.126s
+sys     0m0.043s
+
+$ time strace -o strace_output2 ./tr2u 'AB' 'XY' <output.txt>file2fileu
+real    4m37.601s
+user    0m57.704s
+sys     4m6.745s
+
+$ time strace -o strace_output3 ./tr2b 'AB' 'XY' < output.txt
+real    0m5.613s
+user    0m0.411s
+sys     0m1.316s
+
+$ time strace -o strace_output4 ./tr2u 'AB' 'XY' < output.txt
+real    5m39.493s
+user    1m8.526s
+sys     5m0.390s

@@ -1,0 +1,26 @@
+We start by setting up our BeagleBone by
+1) Connecting it to our computer via USB
+2) We then found the "BeagleBone Getting Started" drive
+3) Installed the necessary drivers
+4) Checked the "START.htm" file to see if our drivers were all installed
+5) SSH-ed into BeagleBone
+   - hostname: 192.168.7.2
+6) Then we did the following commands
+$  sudo connmanctl
+connmanctl> enable wifi
+connmanctl> scan wifi
+connmanctl> services
+connmanctl> agent on
+connmanctl> wifi_2cf7f106539a_55434c415f5745425f524553_managed_n
+connmanctl> quit
+
+7) Then we find the IP address
+$ ifconfig
+inet addr:169.232.127.105  Bcast:169.232.127.255  Mask:255.255.255.
+inet6 addr: fe80::2ef7:f1ff:fe06:539a/64 Scope:Link
+
+8) Now we update the database of apt-get & install xauth tool for X11
+$ sudo apt-get update
+$ sudo apt-get install xauth
+#install firefox
+$ apt-get install firefox-esr-110n-en-gb

@@ -1,0 +1,109 @@
+#!/bin/bash
+# Name: Zachary Prong
+# UID: 304-958-784
+# Objective: check for duplicate files, then replace duplicates with
+# hardlinks (alphabetical order but "." takes precedence)
+# - Script should ignore nonregular files (symbolic links, directories)
+# - Reports error for nonreadable files, not treated as duplicate
+# - Should be able to handle files that contain spaces, "*", and leading "-"
+D=$1
+files=`ls $D | sort`
+hiddenFiles=`ls -a $D | grep '^\.'| sort`
+echo "$files"
+for hiddenFile in $hiddenFiles
+do
+    hiddenFiles=`echo "$hiddenFiles" | sed 's/^$hiddenFile//g' | sort `
+    if [ -L "$D/$hiddenFile" ]
+    then
+	:
+    elif [ ! -f "$D/$hiddenFile" ]
+    then
+	:
+    elif [ ! -r "$D/$hiddenFile" ]
+    then
+	echo "$hiddenFile is not readable"  
+    else
+
+	for comparisonFile in $hiddenFiles
+	do
+	    if [ -L "$D/$comparisonFile" ]
+	    then
+		:
+	    elif [ ! -f "$D/$comparisonFile" ]
+	    then
+		:
+	    elif [ ! -r "$D/$comparisonFile" ]
+	    then
+		echo "$comparisonFile is not readable"  
+	    else
+		if cmp -s "$D/$hiddenFile" "$D/$comparisonFile"
+		then
+		    ln -fP "$D/$hiddenFile" "$D/$comparisonFile"
+		    #files='echo "$files" | sed 's/^$comparisonFile//g' | sort'
+		else
+		    :
+		fi
+	    fi
+	done
+       
+	for comparisonFile2 in $files
+	do
+	    if [ -L "$D/$comparisonFile2" ]
+	    then
+		:
+	    elif [ ! -f "$D/$comparisonFile2" ]
+	    then
+		:
+	    elif [ ! -r "$D/$comparisonFile2" ]
+	    then
+		echo "$comparisonFile2 is not readable"  
+	    else
+		if cmp -s "$D/$hiddenFile" "$D/$comparisonFile2"
+		then
+		    ln -fP "$D/$hiddenFile" "$D/$comparisonFile2"
+		    #files='echo "$files" | sed 's/^$comparisonFile2//g' | sort'
+		else
+		    :
+		fi
+	    fi
+        done
+    fi   	
+done
+
+for file in $files
+do
+    files=`echo "$files" | sed 's/^$file//g' | sort `
+    if [ -L "$D/$file" ]
+    then
+	:
+    elif [ ! -f "$D/$file" ]
+    then
+	:
+    elif [ ! -r "$D/$file" ]
+    then
+	echo "$file is not readable"
+    else
+	for comparisonFile3 in $files
+	do
+	    if [ -L "$D/$comparisonFile3" ]
+	    then
+		:
+	    elif [ ! -f "$D/$comparisonFile3" ]
+	    then
+		:
+	    elif [ ! -r "$D/$comparisonFile3" ]
+	    then
+		echo "$comparisonFile3 is not readable"  
+	    else
+		if cmp -s "$D/$file" "$D/$comparisonFile3"
+		then
+		    ln -fP "$D/$file" "$D/$comparisonFile3"
+		    #files='echo "$files" | sed 's/^$comparisonFile3//g' | sort'
+		else
+		    :
+		fi
+	    fi
+	done
+    fi
+done
+

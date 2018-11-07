@@ -1,0 +1,42 @@
+Name: Zachary Prong
+UID: 304-958-784
+
+1. The Brady's patch removed the line "case_long_iso_time_style:" because
+   this was the case where different locales used the ls -l command.
+   Now it's replaced as case long rather than case_long. This was not
+   necessary because case long_iso_time_style: would fall into the same
+   case as case_long.
+
+2. If my company adopts this patched version, then this would be bad
+   if places with different locales tried sorting our files. This would
+   produce different sorting results than ours and also confuse workers
+   in other countries.
+
+3. We try it out by typing the following
+$ ./randline.py -n 1 /dev/null
+  And we get this:
+  Traceback (most recent call last):
+  File "./randline.py", line 70, in <module>
+    main()
+  File "./randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "./randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/lib64/python2.7/random.py", line 274, in choice
+    return seq[int(self.random() * len(seq))]
+    # raises IndexError if seq is  empty
+  IndexError: list index out of range
+
+  Basically, invoking this script causes a traceback on the most recent
+  call inside randline.py. This is because the program is trying to access
+  an address outside of the list, thus throwing an IndexError exception.
+  Such problems can be found in displayed line numbers in our traceback.
+
+4. We do the following:
+$ python3 randline.py -n 3 sample.txt
+  File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+  SyntaxError: invalid syntax
+  This throws out a string exception error because of the fact that
+  Python3 does not do automatic tuple unpacking while Python2 does.

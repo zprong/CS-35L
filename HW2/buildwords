@@ -1,0 +1,19 @@
+#!/bin/bash
+# Name: Zachary Prong
+# UID: 304958784
+sed '/<!DOCTYPE/,/Adopt<\/td>/d' |
+sed '/<\/table/,/<\/html>/d' |
+sed '/<tr>/,/<\/td>/d' |
+tr -d '\n' |
+sed 's/<\/td>/\n/g' |
+sed 's/,/\n/g' |
+sed 's/<[^>]*>//g' |
+sed s/\`/\'/g | 
+tr -d '[:blank:]' |
+tr '[:upper:]' '[:lower:]' |
+tr -cs "pk\'mnwlhaeiou'" '[\n*]' |
+sed '/^$/d' |
+sort -u 
+
+
+

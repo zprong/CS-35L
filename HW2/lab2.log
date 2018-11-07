@@ -1,0 +1,92 @@
+Name: Zachary Prong
+UID: 304-958-784
+
+We first check our locale to see whether we are in standard C.
+$ locale
+Because it turns out that we aren't, we do the following:
+$ export LC_ALL='C'
+
+We then want to make a sorted list of English words and so we do so,
+storing it into a file called 'words'
+$ sort /usr/share/dict/words >words
+
+We now get the HTML of the assignment webpage
+$ wget https://web.cs.ucla.edu/classes/winter18/cs35L/assign/assign2.html
+where assign2.html is our html file.
+
+Now that we have that, we run the following commands
+as told on our lab:
+(We note that our text file needs to be our std input)
+$ tr -c 'A-Za-z' '[\n*]' < assign2.html
+This basically replaced characters in the html file that
+weren't within the ranges A-Z and a-z with newline characters. 
+
+$ tr -cs 'A-Za-z' '[\n*]' < assign2.html
+This replaced those newline characters that appeared in our first command
+with only 1 instance of it (according to the manpages) so now there
+are only 1 newline characters between each word.
+
+$ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort
+This does the same as the previous command but now strings are sorted
+alphabetically
+
+$ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u
+Same as previous command EXCEPT now there are no repeats of any strings
+
+$ tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - word
+This compares line by line between our previous command's output and
+the std input of the word file. It then outputs 3 columns
+Column 1 = unique lines (words) of assign2.html
+Column 2 = unique lines (words) of words
+Column 3 = Common lines (words) between the two files
+
+$ tr -cs 'A-Za-z' '[\n*]' < assign2.html| sort -u | comm -23 - words 
+This suppresses columns 2 and 3 so only the unique words of column 1 appeared
+
+Now we obtain our "English to Hawaiian" table
+$ wget http://mauimapp.com/moolelo/hwnwdseng.htm
+
+Our job is to now isolate the text file so that it lets us read only
+the English to Hawaiian word translations
+
+We create our script file buildwords and adjust our permissions
+$ emacs buildwords
+$ chmod +x buildwords
+
+We then run the script by doing this:
+$ ./buildwords < hawaiian.html > hwords
+This gives us our Hawaiian dictionary (hword)
+
+We then implement our Hawaiian dictionary on assign2.html
+$ tr -cs "pk\'mnwlhaeiou" '[\n*]' | tr '[:upper:] '[:lower:]' |
+  sort -u | comm -23 - hwords > hCheck
+
+Then we run the following command to see the number of Hawaiian words
+that were misspelled
+$ wc -w hCheck
+Output: 204 hCheck
+
+Now we need to find the number of misspelled English words and store
+the misspelled words in text file eCheck
+$ tr -cs 'A-Za-z' '[\n*]' <assign2.html | tr '[:upper:]' '[:lower:]' | sort -u | comm -23 - words > eCheck
+$ wc -w eCheck
+Output: 38 eCheck
+
+This tells us that there were 204 misspelled Hawaiian words and 38
+misspelled English words
+
+Then we check what words are misspelled in English but not in Hawaiian
+$ tr -cs "pk\'mnwlhaeiou" '[\n*]' < eCheck| sort -u |
+comm -12 - hwords > misEcorrectH
+We found these words:
+Halau, po, and wiki
+
+Then misspelled in Hawaiian but not in English
+$ tr -cs "A-Za-z" '[\n*]' < hCheck| sort -u |
+comm -12 - words > misHcorrectE
+We found a lot more with this one (111 to be exact!)
+But here are some words:
+a, ail, ain, ake, al... etc.
+
+
+

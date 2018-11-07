@@ -1,0 +1,51 @@
+Name: Zachary Prong
+UID: 304-958-784
+
+1. We first grab Coreutils 7.6
+$ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+2. We then extract our tar file that we just received
+$ tar -xvzf coreutils-7.6.tar.gz
+  We enter into our coreutils-7.6 directory and compile
+$ coreutils-7.6
+$ pwd # to see our absolute path
+$ ./configure --prefix=/u/cs/ugrad/prong/35L/lab3/coreutils
+$ make
+$ make install
+  It generated some errors but I ended up reconfiguring and it didn't
+  display the error again...
+	We then go into our coreutils directory and export our locale
+$ export LC_ALL='en_US.UTF-8'
+  We then go to the /bin directory and run the following
+$ ./ls -l /bin/bash
+  -rwxr-xr-x 1 root root 960632 2017-08-03 06:36 /bin/bash
+  As we can see, we've reproduced the bug of displaying YYYY-MM-DD
+
+3/4. Now we have to install the Brady Patch.
+   We create a file bradypatch.diff and copy and paste the patch file
+   into here. Then we patch it up
+$ patch -p0 < bradypatch.diff
+  We then specify ls.c to be the file to be patched.
+  We go back into coreutils7.6 and recompile
+$ make
+  Now we go into our parent directory lab3 and check the following
+  For our installed file:
+$ ./coreutils/bin/ls -l ./coreutils-7.6.tar.gz
+  -rw-r--r-- 1 prong csugrad 10014650 2018-02-03 21:09 ./coreutils-7.6.tar.gz
+  and for our modified file:
+$ ./coreutils-7.6/src/ls -l ./coreutils-7.6.tar.gz
+  -rw-r--r-- 1 prong csugrad 10014650 Feb  3 21:09 coreutils-7.6.tar.gz
+
+5. We use the touch command with the t-flag to artificially make our
+  tar.gz file at least 1 year old. We set it to Jan 23 2017 01:01:30
+$ touch -t 201701230101.30 coreutils-7.6.tar.gz
+  For the modified file:
+$ ./coreutils-7.6/src/ls -l ./coreutils-7.6.tar.gz
+  -rw-r--r-- 1 prong csugrad 10014650 Jan 23  2017 ./coreutils-7.6.tar.gz
+  For the installed file:
+  -rw-r--r-- 1 prong csugrad 10014650 2017-01-23 01:01 ./coreutils-7.6.tar.gz
+  
+
+
+  
+

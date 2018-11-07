@@ -1,0 +1,82 @@
+1. man -k <word>
+
+2. $ whereis cp 
+   cp is located in usr/local/cs/bin/cp
+   $ whereis wc
+   wc is located in /usr/local/cs/bin/wc
+
+3. $ find /usr/bin -name "?"
+   We then find executables X, w, and [.
+   Then using the man-pages and the help shell-command, we find the followin	g:
+   w - shows who is logged on and what they are doing
+   [ - evaluates a conditional expression
+   X - There is no manpage for X
+
+4. Putting /usr/bin/emacs into the command line takes you to GNU Emacs,
+which is a subset of the GNU OS
+
+5. using g+s grants permission for the group to run an executable
+with permissions and privileges of the group
+   using o-x removes the privilege of those of the "other" group
+   to execute a file.
+   
+6. the -ctime -n option lets you search for files changed in the last n
+days. Therefore if you replace n with 21, you can check for files modified
+in the last three weeks
+
+7. Using $ manpage find
+   and typing /type, we find that find -d will look for directories.
+   So we type $ / -type d -ctime -21 in our command line
+
+8. $ whereis find
+   $ cd /usr/bin
+   $ ls -l -H
+   The answer should be found on the very top of the output. 
+
+9. $ ls /usr/lib -lt
+   The oldest file is libgpg-error.so.0.10.0  dated back to Jan 26 2014
+
+10. $ man locale
+    This tells us that locale gets its data from the environment variables
+
+11. Going into emacs, we use the keystroke C-h a and enter "sort" and
+find that it lists these commands:
+    buffer-menu-sort
+    sort-columns
+    sort-fields
+    sort-lines
+    sort-numeric-fields
+    sort-pages
+    sort-paragraphs
+    sort-regexp-fields
+    tabulated-list-col-sort
+    tabulated-list-sort
+
+12. We find this data by scrolling through the key-bindings menu
+through C-H-b
+    C-M-a: beginning-of-defun: Moves cursor back to beginning of
+    the function
+    C-M-b: backward-sexp: Moves cursor to beginning of s-expression
+    C-M-c: exit-recursive-edit: Exits recursively
+    C-M-d: down-list: Moves into inner paranthesis
+    C-M-e: end-of-defun: Moves cursor to end of the function
+    C-M-f: forward-sexp: Moves cursor to end of s-expression
+    C-M-h: mark-defun: Marks a function
+
+13. Through the same process, we found what C-g does.
+    C-g is keystroke for keyboard-quit.
+    But then we use C-h v and enter C-g to find a more detailed
+    definition for it.
+    This signals a 'quit' condition and is an interactive compiled Lisp
+    function.
+    Thus during execution of Lisp code, doing this would cause a direct
+    quit. 
+
+14. Using C-h f and then entering yank, we find the following:
+    Emacs' yank function is basically a "paste" function of whatever
+    text was most recently killed.
+
+15. Using emacs, we used the keystroke C-x d in order to use the dired
+command.
+The only difference is that emacs' dired command also states how many are
+available in the directory rather than only how many are used. 

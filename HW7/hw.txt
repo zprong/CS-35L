@@ -1,0 +1,20 @@
+1. The resulting network would still be secure if teams had been observing
+   all the bytes going across the network. This is because the bytes sent
+   need to be decrypted in order for the bytes to have any meaning to them.
+
+   If the team had also observed all of our team's keystrokes, then that
+   would be bad because they would figure out our password. And to make it
+   even worse, they can use that and compare it with the bytes going across
+   the network and figure out our encrypt/decrypt pattern.
+
+   If the other teams temporarily had physical control of our USB, then
+   that would also be very bad because they'd have access to our .ssh
+   which contains all of our generated public and private keys
+
+2. The gpg --verify command doesn't verify the tar file in question
+   because all it does is verify the signature with a public key. The
+   problem with this is that anyone trying to intercept my transferred file
+   can easily change the signature. One way to truly verify that I created
+   the tar file in question is to include what my signature is in the file.
+   So if they compare the signature of the file to what's in the file, the
+   receiver can tell whether the file was intercepted.

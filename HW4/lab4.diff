@@ -1,0 +1,16 @@
+--- timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ timespec2.h	2018-02-10 22:32:07.621202000 -0800
+@@ -45,0 +45,0 @@
+lib/timespec.h: timespec_cmp now avoids integer overflow
+
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  int greaterThan = (a.tv_sec > b.tv_sec ? 1 : 0) 
++  return greaterThan ? 1 : (a.tv_sec == b.tv_sec ?
++			    a.tv_nsec - b.tv_nsec : -1);   
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

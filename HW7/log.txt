@@ -1,0 +1,77 @@
+We start by setting up our BeagleBone by
+1) Connecting it to our computer via USB
+2) We then found the "BeagleBone Getting Started" drive
+3) Installed the necessary drivers
+4) Checked the "START.htm" file to see if our drivers were all installed
+5) SSH-ed into BeagleBone
+   - hostname: 192.168.7.2
+   - login as: root
+6) Then we did the following commands
+$  sudo connmanctl
+connmanctl> enable wifi
+connmanctl> scan wifi
+connmanctl> services
+connmanctl> agent on
+connmanctl> wifi_2cf7f106539a_5a616368e2809973206950686f6e65_managed_psk
+connmanctl> quit
+
+7) Then we find the IP address
+$ ifconfig
+inet addr:172.20.10.4
+where inet addr is our IP address
+
+8) Now we update the database of apt-get & install xauth tool for X11
+$ sudo apt-get update
+$ sudo apt-get install xauth
+#install firefox
+$ apt-get install firefox-esr-110n-en-gb
+
+We check to see if we have openssh-server and openssh-client installed
+$ dpkg --get-selections | grep openssh
+
+Then we generate our public and private keys
+$ ssh-keygen
+and save it to /root/.ssh/is_rsa and id_resa with no password
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+Output:
+The key fingerprint is:
+79:19:ab:6d:70:2a:a3:4f:bd:64:a9:03:57:c5:2c:dc root@904765400.lasr.cs.ucla.edu
+The key's randomart image is:
++---[RSA 2048]----+
+|       . +       |
+|        o E      |
+|         o.      |
+|        .. +     |
+|       .S =      |
+|    . .. O       |
+|     o+ B o      |
+|     o.* o       |
+|    ..o..        |
++-----------------+
+
+Create an account for client on the server:
+$ sudo useradd -d /home/name -m zach
+$ sudo passwd zach
+Enter new UNIX password: lol
+
+Create .ssh directory for new user
+$ cd /home/name
+$ mkdir .ssh
+
+Change ownership and permission on .ssh directory
+$ sudo chown -R zach .ssh
+$ sudo chmod 700 .ssh
+
+Then my partner accesses my server
+# Copy public key to server 
+$ ssh-copy-id -i zach@172.20.10.4
+# Adds private key to ssh-agent so that he can login again without typing
+  any passwords/phrases
+$ ssh-add
+
+My partner got into my server with the following commands
+ssh zach@172.20.10.4
+
+and he made a file
+$ touch me.txt

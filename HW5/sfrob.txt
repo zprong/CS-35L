@@ -1,0 +1,68 @@
+$ time cat 250.txt | ./sfrob
+real    0m0.002s
+user    0m0.001s
+sys     0m0.001s
+$ time cat 250.txt | ./sfrobu
+real    0m40.163s
+user    0m38.369s
+sys     0m1.794s
+
+$ time cat 500.txt | ./sfrob
+real    0m0.009s
+user    0m0.001s
+sys     0m0.005s
+$ time cat 500.txt | ./sfrobu
+real    0m41.708s
+user    0m39.009s
+sys     0m2.676s
+
+$ time cat 750.txt | ./sfrob
+real    0m0.004s
+user    0m0.001s
+sys     0m0.002s
+$ time cat 750.txt | ./sfrobu 
+real    0m39.395s
+user    0m37.428s
+sys     0m1.967s
+
+
+$ time cat 1kb.txt | ./sfrob
+real    0m0.010s
+user    0m0.000s
+sys     0m0.003s
+
+$ time cat 1kb.txt | ./sfrobu
+real    0m38.173s
+user    0m35.969s
+sys     0m2.197s
+
+---------------------------------
+SFROB:
+$ time printf '~BO {_CIA FKPS NEM' | ./sfrob | od -ta
+real    0m0.009s
+user    0m0.003s
+sys     0m0.011s
+
+SFROBU:
+$ time printf '~BO {_CIA FKPS NEM' | ./sfrobu | od -ta
+real    0m0.016s
+user    0m0.004s
+sys     0m0.024s
+
+SFROBS:
+$ time printf '~BO {_CIA FKPS NEM' | ./sfrobs | od -ta
+real    0m0.245s
+user    0m0.011s
+sys     0m0.040s
+
+SFROBU -f:
+$ time printf '~BO {_CIA FKPS NEM' | ./sfrobu -f | od -ta
+real    0m0.018s
+user    0m0.005s
+sys     0m0.024s
+
+SFROBS -f:
+$ time printf '~BO {_CIA FKPS NEM' | ./sfrobs -f | od -ta
+real    0m0.056s
+user    0m0.010s
+sys     0m0.038s

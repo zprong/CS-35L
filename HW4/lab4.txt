@@ -1,0 +1,110 @@
+Name: Zachary Prong
+UID: 304-958-784
+
+We first use our trusty WinSCP Program to drag our tar file into our lab4
+directory. Then we untar it
+$ tar -xvzf coreutils-with-bug.tar.gz
+
+Now we compile it.
+$ ./configure --prefix=/u/cs/ugrad/prong/35L/lab4/coreutils
+$ make
+There ended up being some errors:
+In file included from utimecmp.c:41:0:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+make[3]: *** [Makefile:659: utimecmp.o] Error 1
+make[3]: Leaving directory '/w/home.05/cs/ugrad/prong/35L/lab4/coreutils-with-bug/lib'
+make[2]: *** [Makefile:414: all] Error 2
+make[2]: Leaving directory '/w/home.05/cs/ugrad/prong/35L/lab4/coreutils-with-bug/lib'
+make[1]: *** [Makefile:419: all-recursive] Error 1
+make[1]: Leaving directory '/w/home.05/cs/ugrad/prong/35L/lab4/coreutils-with-bug'
+make: *** [Makefile:357: all] Error 2
+
+$ make install
+The errors still pop up
+
+We continue by creating our patch file rename.diff and copy+paste
+the code into it.
+We patch it up in our coreutils-with-bug directory.
+$ patch -p0 < rename.diff
+$ make
+$ make install
+Now there are no errors! :D
+
+Then we make our temp directory like our man Eggert did
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ ~/35L/lab4/coreutils-with-bug/src/ls -lt --full-time wwi-armistice
+  now now1
+-rw-r--r-- 1 prong csugrad 0 1918-11-11 03:00:00.000000000 -0800
+wwi-armistice
+-rw-r--r-- 1 prong csugrad 0 2018-02-10 15:49:08.821243257 -0800 now1
+-rw-r--r-- 1 prong csugrad 0 2018-02-10 15:49:02.989145802 -0800 now
+
+This is the buggy output that we were looking for! Reproduction success.
+
+Now we enter gdb to dive into what's really happening
+$ gdb ~/35L/lab4/coreutils-with-bug/src/ls
+We look at our info options and see that looking at the functions might
+give us a good clue on where to set our breakpoints.
+(gdb) info functions
+
+Looking at the File ls.c, we stumble across a number of functions and find
+interest in the following functions:
+static int compare_atime(V, V);
+static int compare_ctime(V, V);
+static int compare_mtime(V, V);
+static int compstr_atime(V, V);
+static int compstr_ctime(V, V);
+
+We set a breakpoint at all of them and run the program
+(gdb) b compare_atime
+(gdb) b compare_ctime
+(gdb) b compare_mtime
+(gdb) b compstr_atime
+(gdb) b compstr_ctime
+(gdb) run -lt --full-time
+Breakpoint 4, compare_mtime (a=0x617180, b=0x617230) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, xstrcoll); }
+
+(gdb) si
+We stepped into nested function inside compare_mtime called timespec_cmp
+and see this:
+
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+
+We see a ternary expression!
+It basically reads that if diff != 0, return diff, and if it is,
+return (a.tv_nsec - b.tv_nsec)
+If you've taken Eggert's CS 33 class, you might see an issue with integer
+overflow in this expression if diff == 0.
+
+We take the timespec.h from our lib directory and make a copy of it and
+rename it.
+$ cp timespec.h timespec2.h
+
+After adjusting our copy of it in timespec2.h, we run the diff command
+$ diff -u timespec.h timespec2.h > lab4.diff
+and that's our patch file. Hurray!
+
+Now to SEA(snet) what happened on our Linux servers, we do the following
+in our home directory:
+$ touch -d '1918-11-11 11:00 GMT' bye.txt
+$ touch now
+
+We see that our two command prints these out with our ls command
+$ ls -lt
+-rw-r--r--  1 prong csugrad    0 Dec 17  2054 bye.txt
+-rw-r--r--  1 prong csugrad    0 Feb 10 23:11 now
+
+We see that our first touch command was responded by the SEASnet servers
+with an access date of Dec 17 2054. Well done, SEAS.
+This happens because the SEASnet NFS file system has 32-bit time stamps
+whereas the Local File System has 64-bit time stamps. 
+
+
